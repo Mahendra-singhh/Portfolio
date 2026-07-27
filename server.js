@@ -25,19 +25,50 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// --- ADMIN AUTHENTICATION MIDDLEWARE ---
+const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+const ADMIN_PASS = process.env.ADMIN_PASS || 'Puneesh@2026'; // Change your password here or in .env
+
+const requireAdminAuth = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        res.setHeader('WWW-Authenticate', 'Basic realm="Admin Panel Access"');
+        return res.status(401).send('Authentication required to access Admin Panel.');
+    }
+
+    // Decode credentials from Base64
+    const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
+    const username = auth[0];
+    const password = auth[1];
+
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+        return next();
+    }
+
+    res.setHeader('WWW-Authenticate', 'Basic realm="Admin Panel Access"');
+    return res.status(401).send('Invalid username or password.');
+};
+
+// Protect admin API endpoints and admin HTML page
+app.get('/admin', requireAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+app.get('/admin.html', requireAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+app.use('/api/admin', requireAdminAuth, adminRoutes);
+
 // Serve static assets from 'public' folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 // API Routes
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/content', contentRoutes);
-app.use('/api/admin', adminRoutes);
 
 // Direct HTML Fallback Routes
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

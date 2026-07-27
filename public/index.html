@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puneesh Kumar | Yoga Trainer & Wellness Expert</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo" onclick="navigateTo('home')">
+                <span class="prof-name-text">PUNEESH KUMAR</span> <i class="fa-solid fa-circle-check" title="Verified Professional"></i>
+            </a>
+            <nav>
+                <ul>
+                    <li><a id="nav-home" class="active" onclick="navigateTo('home')">Home</a></li>
+                    <li><a id="nav-about" onclick="navigateTo('about')">About</a></li>
+                    <li><a id="nav-services" onclick="navigateTo('services')">Services & Plans</a></li>
+                    <li><a id="nav-gallery" onclick="navigateTo('gallery')">Gallery</a></li>
+                    <li><a id="nav-testimonials" onclick="navigateTo('testimonials')">Testimonials</a></li>
+                    <li><a class="btn-nav-book" onclick="openModal()">Book Appointment</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Body -->
+    <main>
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <div class="hero">
+                <h1 class="prof-name-text">Puneesh Kumar</h1>
+                <div class="hero-subtitle prof-title-text">Yoga Trainer | Wellness Expert</div>
+                <p id="profTagline">Teaching yoga to every age group. Tailored practices for weight management, lifestyle disorders, and overall wellness.</p>
+                <button class="btn" onclick="openModal()">Book 1st Consultation Free</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><i class="fa-solid fa-star"></i><h3>4.9 / 5</h3><p>Client Reviews</p></div>
+                <div class="stat-card"><i class="fa-solid fa-users"></i><h3>2000+</h3><p>Clients Trained</p></div>
+                <div class="stat-card"><i class="fa-solid fa-clock"></i><h3>5+ Years</h3><p>Teaching Experience</p></div>
+                <div class="stat-card"><i class="fa-solid fa-language"></i><h3>Languages</h3><p>Hindi & English</p></div>
+            </div>
+        </section>
+
+        <!-- About Page -->
+        <section id="about" class="page">
+            <h2>About <span class="prof-name-text">Puneesh Kumar</span></h2>
+            <div class="about-grid">
+                <div class="about-placeholder-img" id="profileImageDisplay"></div>
+                <div>
+                    <p id="profBioText">Certified Yoga Trainer and Wellness Expert with over 5 years of experience guiding 2000+ clients towards healthier lifestyle habits.</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>Education & Certifications</h3>
+                <ul class="info-list" id="dynamicCertsList"></ul>
+            </div>
+        </section>
+
+        <!-- Services Page -->
+        <section id="services" class="page">
+            <h2>Consultation Plans</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div>
+                        <h3>Basic Plan</h3>
+                        <div class="service-price">₹199</div>
+                        <ul class="info-list">
+                            <li><i class="fa-solid fa-check"></i> Quick Guidance</li>
+                            <li><i class="fa-solid fa-check"></i> Basic Consultation</li>
+                        </ul>
+                    </div>
+                    <button class="btn" onclick="openModal()" style="margin-top: 1.5rem; width: 100%;">Book Now</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="popular-badge">Popular</div>
+                    <div>
+                        <h3>Premium Plan</h3>
+                        <div class="service-price">₹499</div>
+                        <ul class="info-list">
+                            <li><i class="fa-solid fa-check"></i> Health Plan</li>
+                            <li><i class="fa-solid fa-check"></i> Complete Support</li>
+                        </ul>
+                    </div>
+                    <button class="btn" onclick="openModal()" style="margin-top: 1.5rem; width: 100%;">Book Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Page -->
+        <section id="gallery" class="page">
+            <h2>Gallery of Work</h2>
+            <div class="gallery-grid" id="dynamicGalleryGrid"></div>
+        </section>
+
+        <!-- Testimonials Page -->
+        <section id="testimonials" class="page">
+            <h2>Client Testimonials</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <p>"Puneesh sir's guidance on PCOD management made a huge difference!"</p>
+                    <div class="client-name">— Ananya S.</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="appointmentModal">
+        <div class="modal-container">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div class="modal-sidebar">
+                <div class="modal-sidebar-item"><i class="fa-solid fa-shield-halved"></i> Secure Booking</div>
+                <div class="modal-sidebar-item"><i class="fa-solid fa-clock"></i> Flexible Timings</div>
+            </div>
+            <div class="modal-content">
+                <h2>APPOINTMENT</h2>
+                <div class="line"></div>
+                <form class="form-grid" id="appointmentForm" onsubmit="handleFormSubmit(event)">
+                    <div class="form-group"><label>Name <span>*</span></label><input type="text" id="name" placeholder="Enter Full Name" required></div>
+                    <div class="form-group"><label>WhatsApp <span>*</span></label><div class="phone-input"><span>🇮🇳 +91</span><input type="tel" id="whatsappNumber" placeholder="Enter Number" required></div></div>
+                    <div class="form-group"><label>Email <span>*</span></label><input type="email" id="email" placeholder="Enter Email" required></div>
+                    <div class="form-group"><label>Date <span>*</span></label><input type="date" id="appointmentDate" required></div>
+                    <div class="form-group"><label>Time <span>*</span></label><input type="time" id="appointmentTime" value="06:00" required></div>
+                    <div class="form-group">
+                        <label>Concern <span>*</span></label>
+                        <select id="concern" required>
+                            <option value="">Select Concern</option>
+                            <option value="Weight Management">Weight Management</option>
+                            <option value="PCOD/PCOS Management">PCOD/PCOS Management</option>
+                            <option value="Overall Wellness">Overall Wellness</option>
+                            <option value="Sugar Management">Sugar Management</option>
+                            <option value="Pain Management">Pain Management</option>
+                            <option value="Sleep Problems">Sleep Problems</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Age Group <span>*</span></label>
+                        <select id="ageGroup" required>
+                            <option value="">Select Age Group</option>
+                            <option value="Under 18 Years">Under 18 Years</option>
+                            <option value="18-25">18 - 25</option>
+                            <option value="26-35">26 - 35</option>
+                            <option value="36-50">36 - 50</option>
+                            <option value="50+">50+</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender <span>*</span></label>
+                        <select id="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-submit full-width" id="submitBtn">Submit Appointment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>&copy; 2026 Puneesh Kumar Yoga & Wellness. All rights reserved.</footer>
+    <script src="/js/main.js"></script>
+</body>
+</html>

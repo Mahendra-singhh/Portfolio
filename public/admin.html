@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Puneesh Kumar Yoga</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+<body>
+
+    <!-- Left Sidebar Navigation -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+            <a href="#" class="logo">
+                <span class="prof-name-text">PUNEESH KUMAR</span>
+                <i class="fa-solid fa-circle-check" style="color: #22c55e;"></i>
+            </a>
+            <span class="admin-badge">[ADMIN DASHBOARD]</span>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li>
+                <a class="active" onclick="showSection('appointments-section', this)">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Appointments & Search</span>
+                </a>
+            </li>
+            <li>
+                <a onclick="showSection('profile-section', this)">
+                    <i class="fa-solid fa-id-card"></i>
+                    <span>Profile & Bio</span>
+                </a>
+            </li>
+            <li>
+                <a onclick="showSection('certs-section', this)">
+                    <i class="fa-solid fa-award"></i>
+                    <span>Certifications</span>
+                </a>
+            </li>
+            <li>
+                <a onclick="showSection('gallery-section', this)">
+                    <i class="fa-solid fa-images"></i>
+                    <span>Gallery Photos</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="/" target="_blank" class="btn" style="width: 100%; text-align: center; box-sizing: border-box;">
+                <i class="fa-solid fa-globe"></i> <span>View Live Site</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="admin-main-wrapper">
+        <div class="admin-top-bar">
+            <h1 id="currentSectionTitle">Appointments & Search</h1>
+            <button class="btn" onclick="loadAdminData()"><i class="fa-solid fa-rotate"></i> Refresh Data</button>
+        </div>
+
+        <!-- 1. APPOINTMENTS SECTION (ONLY VISIBLE WHEN SELECTED) -->
+        <section id="appointments-section" class="admin-section active-section">
+            <div class="card-header-flex">
+                <h2><i class="fa-solid fa-calendar-check"></i> Appointments & User Data</h2>
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass" style="color:#888;"></i>
+                    <input type="text" id="adminSearchInput" placeholder="Search name, phone, email, concern..." onkeyup="filterData()">
+                </div>
+            </div>
+
+            <!-- Tab Navigation inside Appointments -->
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchTab('upcomingTab', this)">Upcoming Appointments</button>
+                <button class="tab-btn" onclick="switchTab('pastTab', this)">Previous Appointments</button>
+                <button class="tab-btn" onclick="switchTab('usersTab', this)">All Users Directory</button>
+            </div>
+
+            <!-- Tab 1: Upcoming -->
+            <div id="upcomingTab" class="tab-content">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Client Name</th>
+                                <th>WhatsApp Number</th>
+                                <th>Email</th>
+                                <th>Concern</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="upcomingTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 2: Previous -->
+            <div id="pastTab" class="tab-content" style="display: none;">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Past Date</th>
+                                <th>Client Name</th>
+                                <th>WhatsApp Number</th>
+                                <th>Email</th>
+                                <th>Concern</th>
+                                <th>Age</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pastTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 3: All Users Directory -->
+            <div id="usersTab" class="tab-content" style="display: none;">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Client Name</th>
+                                <th>WhatsApp Number</th>
+                                <th>Email</th>
+                                <th>Gender</th>
+                                <th>Age Group</th>
+                                <th>Total Bookings</th>
+                                <th>Last Booking Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. PROFILE & BIO SECTION (ONLY VISIBLE WHEN SELECTED) -->
+        <section id="profile-section" class="admin-section">
+            <div class="card-header-flex">
+                <h2><i class="fa-solid fa-id-card"></i> Profile & Overview</h2>
+                <button class="btn" onclick="openEditModal('profileModal')"><i class="fa-solid fa-pen-to-square"></i> Edit Profile Details</button>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-placeholder-img" id="adminProfileImgDisplay" style="position: relative; height: 350px;">
+                    <button class="btn" onclick="openEditModal('picModal')" style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; padding: 6px 12px;">
+                        <i class="fa-solid fa-camera"></i> Change Photo
+                    </button>
+                </div>
+                <div>
+                    <div class="info-card">
+                        <h3>Current Live Bio</h3>
+                        <p id="adminBioDisplay">Loading bio...</p>
+                        <p style="margin-top:1rem;"><strong>Email:</strong> <span id="adminEmailDisplay">-</span></p>
+                        <p><strong>Phone:</strong> <span id="adminPhoneDisplay">-</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. CERTIFICATIONS SECTION (ONLY VISIBLE WHEN SELECTED) -->
+        <section id="certs-section" class="admin-section">
+            <div class="info-card">
+                <div class="card-header-flex">
+                    <h2><i class="fa-solid fa-award"></i> Certifications Management</h2>
+                    <button class="btn" onclick="openEditModal('certModal')"><i class="fa-solid fa-plus"></i> Add Certification</button>
+                </div>
+                <ul class="info-list" id="adminCertsList" style="margin-top:1.5rem;"></ul>
+            </div>
+        </section>
+
+        <!-- 4. GALLERY SECTION (ONLY VISIBLE WHEN SELECTED) -->
+        <section id="gallery-section" class="admin-section">
+            <div class="info-card">
+                <div class="card-header-flex">
+                    <h2><i class="fa-solid fa-images"></i> Gallery Photos Management</h2>
+                    <button class="btn" onclick="openEditModal('galleryModal')"><i class="fa-solid fa-upload"></i> Upload Photo</button>
+                </div>
+                <div class="gallery-grid" id="adminGalleryGrid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:1.5rem; margin-top:1.5rem;"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- EDIT MODALS -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal-container modal-content-admin">
+            <span class="close-modal" onclick="closeEditModal('profileModal')">&times;</span>
+            <h2>Edit Profile Details</h2>
+            <div class="line"></div>
+            <form id="profileForm">
+                <div class="form-group"><label>Full Name</label><input type="text" id="profName" required></div>
+                <div class="form-group"><label>Professional Title</label><input type="text" id="profTitle" required></div>
+                <div class="form-group"><label>Bio / Overview</label><textarea id="profBio" rows="4" style="padding:10px; border-radius:6px; border:1px solid #ccc;" required></textarea></div>
+                <div class="form-group"><label>Email</label><input type="email" id="profEmail" required></div>
+                <div class="form-group"><label>Phone</label><input type="text" id="profPhone" required></div>
+                <button type="submit" class="btn full-width" style="margin-top:15px; width:100%;">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="picModal">
+        <div class="modal-container modal-content-admin">
+            <span class="close-modal" onclick="closeEditModal('picModal')">&times;</span>
+            <h2>Change Profile Picture</h2>
+            <div class="line"></div>
+            <form id="picForm">
+                <div class="form-group"><label>Select New Image File</label><input type="file" id="picFile" accept="image/*" required></div>
+                <button type="submit" class="btn full-width" style="margin-top:15px; width:100%;">Upload New Photo</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="certModal">
+        <div class="modal-container modal-content-admin">
+            <span class="close-modal" onclick="closeEditModal('certModal')">&times;</span>
+            <h2>Add Certification</h2>
+            <div class="line"></div>
+            <form id="certForm">
+                <div class="form-group"><label>Title</label><input type="text" id="certTitle" placeholder="e.g. 500-Hour RYT" required></div>
+                <div class="form-group"><label>Description</label><input type="text" id="certDesc" placeholder="e.g. Certified Yoga Instructor" required></div>
+                <button type="submit" class="btn full-width" style="margin-top:15px; width:100%;">Add Certification</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="galleryModal">
+        <div class="modal-container modal-content-admin">
+            <span class="close-modal" onclick="closeEditModal('galleryModal')">&times;</span>
+            <h2>Upload Gallery Photo</h2>
+            <div class="line"></div>
+            <form id="galleryForm">
+                <div class="form-group"><label>Photo Title / Caption</label><input type="text" id="galTitle" placeholder="e.g. Outdoor Retreat" required></div>
+                <div class="form-group"><label>Select Image File</label><input type="file" id="galFile" accept="image/*" required></div>
+                <button type="submit" class="btn full-width" style="margin-top:15px; width:100%;">Upload to Gallery</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>&copy; 2026 Puneesh Kumar Yoga & Wellness Admin.</footer>
+
+<!-- Separate Admin JS Script -->
+<script src="/js/admin.js"></script>
+</body>
+</html>

@@ -185,3 +185,42 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+// Submit Testimonial
+document.getElementById('testimonial-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        name: document.getElementById('testi-name').value,
+        roleOrCity: document.getElementById('testi-role').value,
+        rating: document.getElementById('testi-rating').value,
+        message: document.getElementById('testi-message').value
+    };
+
+    const res = await fetch('/api/content/testimonials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    alert(data.message);
+    e.target.reset();
+});
+
+// Load Approved Testimonials
+async function loadTestimonials() {
+    const list = document.getElementById('testimonials-list');
+    if (!list) return;
+
+    const res = await fetch('/api/content/testimonials');
+    const testimonials = await res.json();
+
+    list.innerHTML = testimonials.map(t => `
+        <div class="testimonial-card">
+            <h4>${t.name} <small>(${t.roleOrCity})</small></h4>
+            <p>Rating: ${'⭐'.repeat(t.rating)}</p>
+            <p>"${t.message}"</p>
+        </div>
+    `).join('');
+}
+
+document.addEventListener('DOMContentLoaded', loadTestimonials);

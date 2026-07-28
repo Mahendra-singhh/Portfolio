@@ -170,7 +170,28 @@
             </div>
         </div>
     </div>
+<section id="testimonials">
+  <h2>What Our Clients Say</h2>
+  
+  <!-- Container where approved testimonials render -->
+  <div id="testimonials-list" class="testimonials-grid"></div>
 
+  <!-- User Submission Form -->
+  <div class="add-testimonial-box">
+    <h3>Leave a Review</h3>
+    <form id="testimonial-form">
+      <input type="text" id="testi-name" placeholder="Your Name" required />
+      <input type="text" id="testi-role" placeholder="City / Occupation (e.g. Delhi, Student)" />
+      <select id="testi-rating">
+        <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+        <option value="4">⭐⭐⭐⭐ (4/5)</option>
+        <option value="3">⭐⭐⭐ (3/5)</option>
+      </select>
+      <textarea id="testi-message" placeholder="Share your yoga experience..." required></textarea>
+      <button type="submit" class="btn">Submit Review</button>
+    </form>
+  </div>
+</section>
     <footer>&copy; 2026 Puneesh Kumar Yoga & Wellness. All rights reserved.</footer>
     <script src="/js/main.js"></script>
 </body>

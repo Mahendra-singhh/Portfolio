@@ -102,5 +102,31 @@ router.delete('/gallery/:id', async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
+// In routes/adminRoutes.js
+const express = require('express');
+const router = express.Router();
+// Assuming you have an Admin model or config file
+const fs = require('fs');
+const path = require('path');
+
+// Route to update credentials
+router.post('/change-credentials', (req, res) => {
+    const { newUsername, newPassword } = req.body;
+
+    if (!newUsername || !newPassword) {
+        return res.status(400).json({ message: 'Both username and password are required.' });
+    }
+
+    // Example using .env file / environment variable updates or JSON store:
+    // Update process.env for current session
+    process.env.ADMIN_USER = newUsername;
+    process.env.ADMIN_PASS = newPassword;
+
+    // Optional: Persist to a JSON config or database so changes survive restarts
+    const configPath = path.join(__dirname, '../config/adminConfig.json');
+    fs.writeFileSync(configPath, JSON.stringify({ ADMIN_USER: newUsername, ADMIN_PASS: newPassword }));
+
+    res.json({ message: 'Admin credentials updated successfully!' });
+});
 
 module.exports = router;

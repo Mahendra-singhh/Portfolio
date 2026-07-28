@@ -29,5 +29,28 @@ router.get('/', async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
+const Testimonial = require('../models/Testimonial');
+
+// Public route to post a new testimonial
+router.post('/testimonials', async (req, res) => {
+    try {
+        const { name, roleOrCity, message, rating } = req.body;
+        const newTestimonial = new Testimonial({ name, roleOrCity, message, rating });
+        await newTestimonial.save();
+        res.status(201).json({ message: 'Testimonial submitted! It will appear after admin review.' });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to submit testimonial' });
+    }
+});
+
+// Public route to get approved testimonials for homepage display
+router.get('/testimonials', async (req, res) => {
+    try {
+        const testimonials = await Testimonial.find({ status: 'approved' }).sort({ createdAt: -1 });
+        res.json(testimonials);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch testimonials' });
+    }
+});
 
 module.exports = router;

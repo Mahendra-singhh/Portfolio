@@ -254,3 +254,17 @@ async function deleteGalleryItem(id) {
 }
 
 document.addEventListener('DOMContentLoaded', loadAdminData);
+document.getElementById('change-credentials-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const newUsername = document.getElementById('new-admin-user').value;
+    const newPassword = document.getElementById('new-admin-pass').value;
+
+    const res = await fetch('/api/admin/change-credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newUsername, newPassword })
+    });
+
+    const data = await res.json();
+    alert(data.message);
+});

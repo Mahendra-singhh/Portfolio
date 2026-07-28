@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const Content = require('../models/Content');
 
 // Configure Multer Storage for file uploads
@@ -26,7 +27,9 @@ const getContentDoc = async () => {
     return content;
 };
 
+// ==========================================
 // 1. Update Profile & Bio Details
+// ==========================================
 router.post('/profile', async (req, res) => {
     try {
         const content = await getContentDoc();
@@ -38,7 +41,9 @@ router.post('/profile', async (req, res) => {
     }
 });
 
+// ==========================================
 // 2. Upload Profile Picture
+// ==========================================
 router.post('/upload-profile-pic', upload.single('profilePic'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
@@ -51,7 +56,9 @@ router.post('/upload-profile-pic', upload.single('profilePic'), async (req, res)
     }
 });
 
+// ==========================================
 // 3. Update Pricing Plans
+// ==========================================
 router.post('/pricing', async (req, res) => {
     try {
         const content = await getContentDoc();
@@ -63,7 +70,9 @@ router.post('/pricing', async (req, res) => {
     }
 });
 
+// ==========================================
 // 4. Add Certification
+// ==========================================
 router.post('/certifications', async (req, res) => {
     try {
         const content = await getContentDoc();
@@ -75,7 +84,9 @@ router.post('/certifications', async (req, res) => {
     }
 });
 
+// ==========================================
 // 5. Upload & Add Gallery Item
+// ==========================================
 router.post('/upload-gallery', upload.single('galleryImage'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ success: false, message: 'No image uploaded' });
@@ -91,7 +102,9 @@ router.post('/upload-gallery', upload.single('galleryImage'), async (req, res) =
     }
 });
 
+// ==========================================
 // 6. Delete Gallery Item
+// ==========================================
 router.delete('/gallery/:id', async (req, res) => {
     try {
         const content = await getContentDoc();
@@ -102,31 +115,26 @@ router.delete('/gallery/:id', async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
-// In routes/adminRoutes.js
-const express = require('express');
-const router = express.Router();
-// Assuming you have an Admin model or config file
-const fs = require('fs');
-const path = require('path');
 
-// Route to update credentials
+// ==========================================
+// 7. Change Admin Credentials
+// ==========================================
 router.post('/change-credentials', (req, res) => {
-    const { newUsername, newPassword } = req.body;
+    try {
+        const { newUsername, newPassword } = req.body;
 
-    if (!newUsername || !newPassword) {
-        return res.status(400).json({ message: 'Both username and password are required.' });
+        if (!newUsername || !newPassword) {
+            return res.status(400).json({ success: false, message: 'Both username and password are required.' });
+        }
+
+        // Update process environment variables for current session
+        process.env.ADMIN_USER = newUsername;
+        process.env.ADMIN_PASS = newPassword;
+
+        res.json({ success: true, message: 'Admin credentials updated successfully!' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
-
-    // Example using .env file / environment variable updates or JSON store:
-    // Update process.env for current session
-    process.env.ADMIN_USER = newUsername;
-    process.env.ADMIN_PASS = newPassword;
-
-    // Optional: Persist to a JSON config or database so changes survive restarts
-    const configPath = path.join(__dirname, '../config/adminConfig.json');
-    fs.writeFileSync(configPath, JSON.stringify({ ADMIN_USER: newUsername, ADMIN_PASS: newPassword }));
-
-    res.json({ message: 'Admin credentials updated successfully!' });
 });
 
 module.exports = router;

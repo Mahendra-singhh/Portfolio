@@ -167,3 +167,21 @@ async function handleFormSubmit(e) {
         submitBtn.innerText = 'Submit Appointment';
     }
 }
+// Mobile Hamburger Menu Toggle
+document.addEventListener('DOMContentLoaded', () => {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const navUl = document.querySelector('header nav ul');
+
+    if (menuBtn && navUl) {
+        menuBtn.addEventListener('click', () => {
+            navUl.classList.toggle('active');
+        });
+
+        // Close menu when a link inside is clicked
+        navUl.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navUl.classList.remove('active');
+            });
+        });
+    }
+});

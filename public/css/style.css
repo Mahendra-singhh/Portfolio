@@ -722,3 +722,54 @@ footer {
             .admin-main-wrapper { margin-left: 70px; width: calc(100% - 70px); padding: 1rem; }
         }
 
+   /* Base Styles for Desktop (Default) */
+.menu-toggle {
+  display: none; /* Hide hamburger button on desktop */
+  font-size: 1.8rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* ==========================================
+   MOBILE & TABLET VIEW (Screens < 768px)
+   ========================================== */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block; /* Show hamburger button on mobile */
+  }
+
+  .nav-menu {
+    display: none; /* Hide nav items by default on mobile */
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    text-align: center;
+  }
+
+  /* When JS toggles the active class, show the menu */
+  .nav-menu.active {
+    display: flex;
+  }
+
+  .nav-menu a {
+    padding: 0.75rem 1rem;
+    display: block;
+    width: 100%;
+  }
+
+  /* Phone view responsiveness fixes */
+  body {
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+  }
+
+  .hero-section, .services-grid, .stats-container {
+    flex-direction: column;
+    padding: 1rem;
+  }
+}

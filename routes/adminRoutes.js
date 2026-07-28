@@ -136,5 +136,52 @@ router.post('/change-credentials', (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
+// DELETE Gallery Image
+// DELETE Gallery Image using ID or URL parameter
+router.delete('/gallery/:idOrIndex', async (req, res) => {
+    try {
+        const { idOrIndex } = req.params;
+        const content = await Content.findOne();
 
+        if (!content || !content.gallery || content.gallery.length === 0) {
+            return res.status(404).json({ success: false, message: 'No gallery items found.' });
+        }
+
+        let targetItem = null;
+
+        // 1. Try matching by _id or imageUrl first
+        targetItem = content.gallery.find(item => 
+            (item._id && item._id.toString() === idOrIndex) || 
+            (item.imageUrl && encodeURIComponent(item.imageUrl) === encodeURIComponent(idOrIndex))
+        );
+
+        // 2. Fallback: If passed a numeric index string
+        if (!targetItem && !isNaN(parseInt(idOrIndex, 10))) {
+            const idx = parseInt(idOrIndex, 10);
+            targetItem = content.gallery[idx];
+        }
+
+        if (!targetItem) {
+            return res.status(404).json({ success: false, message: 'Target image not found in database.' });
+        }
+
+        // 3. Perform direct $pull update in MongoDB (Guaranteed atomic deletion)
+        if (targetItem._id) {
+            await Content.updateOne(
+                { _id: content._id },
+                { $pull: { gallery: { _id: targetItem._id } } }
+            );
+        } else {
+            await Content.updateOne(
+                { _id: content._id },
+                { $pull: { gallery: { imageUrl: targetImage.imageUrl } } }
+            );
+        }
+
+        return res.json({ success: true, message: 'Image deleted permanently from database!' });
+    } catch (err) {
+        console.error('Gallery Delete Route Error:', err);
+        return res.status(500).json({ success: false, message: 'Server error: ' + err.message });
+    }
+});
 module.exports = router;

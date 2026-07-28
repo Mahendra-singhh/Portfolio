@@ -1,270 +1,358 @@
-// public/js/admin.js
-
 let allAppointments = [];
+let currentFilter = 'upcoming';
 
-// Single Section Visibility Switch
-function showSection(sectionId, element) {
-    document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active-section'));
-    document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+// ==========================================
+// 1. Sidebar Navigation Toggle
+// ==========================================
+function initSidebarNav() {
+    const navItems = document.querySelectorAll('.admin-nav-item');
+    const sections = document.querySelectorAll('.admin-section');
+    const pageTitle = document.getElementById('page-title');
 
-    document.getElementById(sectionId).classList.add('active-section');
-    element.classList.add('active');
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetSectionId = item.getAttribute('data-section');
 
-    const titleText = element.querySelector('span').innerText;
-    document.getElementById('currentSectionTitle').innerText = titleText;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+            navItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            sections.forEach(sec => sec.classList.remove('active-section'));
+            
+            const targetSection = document.getElementById(targetSectionId);
+            if (targetSection) {
+                targetSection.classList.add('active-section');
+            }
+
+            if (pageTitle) {
+                pageTitle.innerText = item.querySelector('span')?.innerText || 'Admin Panel';
+            }
+        });
+    });
 }
 
-function openEditModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeEditModal(id) { document.getElementById(id).style.display = 'none'; }
-
-function switchTab(tabId, btn) {
-    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(tabId).style.display = 'block';
-    btn.classList.add('active');
-}
-
-async function loadAdminData() {
+// ==========================================
+// 2. Fetch Appointments & Render Table
+// ==========================================
+async function loadAppointments() {
     try {
-        const contentRes = await fetch('/api/content');
-        const contentData = await contentRes.json();
+        const res = await fetch('/api/appointments');
+        const data = await res.json();
         
-        if (contentData.success && contentData.data) {
-            const prof = contentData.data.profile;
-            document.getElementById('profName').value = prof.name || '';
-            document.getElementById('profTitle').value = prof.title || '';
-            document.getElementById('profBio').value = prof.bio || '';
-            document.getElementById('profEmail').value = prof.email || '';
-            document.getElementById('profPhone').value = prof.phone || '';
-
-            document.getElementById('adminBioDisplay').innerText = prof.bio || 'No bio set.';
-            document.getElementById('adminEmailDisplay').innerText = prof.email || '-';
-            document.getElementById('adminPhoneDisplay').innerText = prof.phone || '-';
-
-            if (prof.profilePic) {
-                document.getElementById('adminProfileImgDisplay').style.backgroundImage = `url('${prof.profilePic}')`;
-            }
-
-            const certsList = document.getElementById('adminCertsList');
-            certsList.innerHTML = '';
-            (contentData.data.certifications || []).forEach(c => {
-                certsList.innerHTML += `<li><i class="fa-solid fa-award"></i> <strong>${c.title}:</strong> ${c.description}</li>`;
-            });
-
-            const galGrid = document.getElementById('adminGalleryGrid');
-            galGrid.innerHTML = '';
-            (contentData.data.gallery || []).forEach(item => {
-                galGrid.innerHTML += `
-                    <div class="gallery-item" style="position:relative; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-                        <img src="${item.imageUrl}" style="width:100%; height:180px; object-fit:cover; display:block;">
-                        <div style="padding:8px; background:#fff; text-align:center; font-weight:bold; font-size:0.85rem;">${item.title}</div>
-                        <button onclick="deleteGalleryItem('${item._id}')" style="position:absolute; top:8px; right:8px; background:red; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                `;
-            });
-        }
-
-        const appRes = await fetch('/api/appointments');
-        const appData = await appRes.json();
-
-        if (appData.success) {
-            allAppointments = appData.data;
-            renderTables(allAppointments);
-        }
-    } catch (err) { console.error('Admin Load Error:', err); }
-}
-
-function renderTables(data) {
-    const todayStr = new Date().toISOString().split('T')[0];
-
-    const upcomingTbody = document.getElementById('upcomingTable');
-    const pastTbody = document.getElementById('pastTable');
-    const usersTbody = document.getElementById('usersTable');
-
-    upcomingTbody.innerHTML = '';
-    pastTbody.innerHTML = '';
-    usersTbody.innerHTML = '';
-
-    const userMap = {};
-
-    const upcomingList = data.filter(a => a.appointmentDate >= todayStr);
-    const pastList = data.filter(a => a.appointmentDate < todayStr);
-
-    if (upcomingList.length === 0) {
-        upcomingTbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No upcoming appointments.</td></tr>';
-    } else {
-        upcomingList.forEach(app => {
-            const cleanPhone = app.whatsappNumber ? app.whatsappNumber.replace(/\D/g, '') : '';
-            const waUrl = `https://wa.me/91${cleanPhone}?text=Hi%20${encodeURIComponent(app.name)},%20this%20is%20Puneesh%20Kumar.%20Regarding%20your%20yoga%20appointment%20on%20${app.appointmentDate}%20at%20${app.appointmentTime}.`;
-
-            upcomingTbody.innerHTML += `
-                <tr>
-                    <td><strong>${app.appointmentDate}</strong><br><small>${app.appointmentTime}</small></td>
-                    <td>${app.name}</td>
-                    <td>${app.whatsappNumber}</td>
-                    <td>${app.email}</td>
-                    <td>${app.concern}</td>
-                    <td>${app.ageGroup}</td>
-                    <td>${app.gender}</td>
-                    <td><a href="${waUrl}" target="_blank" class="whatsapp-btn"><i class="fa-brands fa-whatsapp"></i> Chat</a></td>
-                </tr>
-            `;
-        });
-    }
-
-    if (pastList.length === 0) {
-        pastTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No past appointments found.</td></tr>';
-    } else {
-        pastList.forEach(app => {
-            pastTbody.innerHTML += `
-                <tr>
-                    <td><strong>${app.appointmentDate}</strong></td>
-                    <td>${app.name}</td>
-                    <td>${app.whatsappNumber}</td>
-                    <td>${app.email}</td>
-                    <td>${app.concern}</td>
-                    <td>${app.ageGroup}</td>
-                    <td><span class="badge-status badge-past">Completed</span></td>
-                </tr>
-            `;
-        });
-    }
-
-    data.forEach(app => {
-        const key = app.email ? app.email.toLowerCase() : app.whatsappNumber;
-        if (!userMap[key]) {
-            userMap[key] = {
-                name: app.name,
-                phone: app.whatsappNumber,
-                email: app.email,
-                gender: app.gender,
-                ageGroup: app.ageGroup,
-                count: 1,
-                lastDate: app.appointmentDate
-            };
+        if (Array.isArray(data)) {
+            allAppointments = data;
+        } else if (data.success && Array.isArray(data.appointments)) {
+            allAppointments = data.appointments;
+        } else if (Array.isArray(data.data)) {
+            allAppointments = data.data;
         } else {
-            userMap[key].count += 1;
-            if (app.appointmentDate > userMap[key].lastDate) {
-                userMap[key].lastDate = app.appointmentDate;
-            }
+            allAppointments = [];
         }
-    });
 
-    const users = Object.values(userMap);
-    if (users.length === 0) {
-        usersTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No users directory data.</td></tr>';
-    } else {
-        users.forEach(u => {
-            usersTbody.innerHTML += `
-                <tr>
-                    <td><strong>${u.name}</strong></td>
-                    <td>${u.phone}</td>
-                    <td>${u.email}</td>
-                    <td>${u.gender}</td>
-                    <td>${u.ageGroup}</td>
-                    <td><span class="badge-status badge-upcoming">${u.count} Session(s)</span></td>
-                    <td>${u.lastDate}</td>
-                </tr>
-            `;
-        });
+        renderAppointments();
+    } catch (err) {
+        console.error('Failed to load appointments:', err);
     }
 }
 
-function filterData() {
-    const query = document.getElementById('adminSearchInput').value.toLowerCase();
-    const filtered = allAppointments.filter(app => 
-        (app.name && app.name.toLowerCase().includes(query)) ||
-        (app.whatsappNumber && app.whatsappNumber.includes(query)) ||
-        (app.email && app.email.toLowerCase().includes(query)) ||
-        (app.concern && app.concern.toLowerCase().includes(query))
-    );
-    renderTables(filtered);
+function renderAppointments() {
+    const tbody = document.getElementById('appointments-tbody');
+    if (!tbody) return;
+
+    const searchTerm = document.getElementById('appointment-search')?.value.toLowerCase().trim() || '';
+    
+    const now = new Date();
+    const localToday = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+    let filtered = allAppointments.filter(app => {
+        const matchesSearch = !searchTerm || 
+            (app.name && app.name.toLowerCase().includes(searchTerm)) ||
+            (app.whatsappNumber && app.whatsappNumber.includes(searchTerm)) ||
+            (app.email && app.email.toLowerCase().includes(searchTerm)) ||
+            (app.concern && app.concern.toLowerCase().includes(searchTerm));
+
+        if (!matchesSearch) return false;
+
+        let appDate = app.appointmentDate || '';
+        if (appDate.includes('-') && appDate.split('-')[0].length === 2) {
+            const parts = appDate.split('-');
+            appDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+
+        if (currentFilter === 'upcoming') {
+            return appDate >= localToday;
+        } else if (currentFilter === 'previous') {
+            return appDate < localToday;
+        }
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align:center; padding:2.5rem; color:#6c757d; font-weight:500;">
+                    No ${currentFilter} appointments found.
+                </td>
+            </tr>`;
+        return;
+    }
+
+    tbody.innerHTML = filtered.map(app => `
+        <tr>
+            <td>
+                <strong>${app.appointmentDate || 'N/A'}</strong>
+                ${app.appointmentTime ? `<br><small style="color:#666;">${app.appointmentTime}</small>` : ''}
+            </td>
+            <td><strong>${app.name || 'N/A'}</strong></td>
+            <td>${app.whatsappNumber || 'N/A'}</td>
+            <td>${app.email || 'N/A'}</td>
+            <td>${app.concern || 'General'}</td>
+            <td>${app.ageGroup || 'N/A'}</td>
+            <td>${app.gender || 'N/A'}</td>
+            <td>
+                <a href="https://wa.me/91${app.whatsappNumber}?text=Hello%20${encodeURIComponent(app.name || '')}," target="_blank" class="whatsapp-btn">
+                    <i class="fa-brands fa-whatsapp"></i> Chat
+                </a>
+            </td>
+        </tr>
+    `).join('');
 }
 
-// Form Handlers
-document.getElementById('profileForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const payload = {
-        name: document.getElementById('profName').value,
-        title: document.getElementById('profTitle').value,
-        bio: document.getElementById('profBio').value,
-        email: document.getElementById('profEmail').value,
-        phone: document.getElementById('profPhone').value
-    };
-    const res = await fetch('/api/admin/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    alert(data.message);
-    closeEditModal('profileModal');
-    loadAdminData();
-};
-
-document.getElementById('picForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('profilePic', document.getElementById('picFile').files[0]);
-    const res = await fetch('/api/admin/upload-profile-pic', { method: 'POST', body: formData });
-    const data = await res.json();
-    alert(data.message);
-    closeEditModal('picModal');
-    loadAdminData();
-};
-
-document.getElementById('certForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const payload = {
-        title: document.getElementById('certTitle').value,
-        description: document.getElementById('certDesc').value
-    };
-    const res = await fetch('/api/admin/certifications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    alert(data.message);
-    closeEditModal('certModal');
-    document.getElementById('certForm').reset();
-    loadAdminData();
-};
-
-document.getElementById('galleryForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('title', document.getElementById('galTitle').value);
-    formData.append('galleryImage', document.getElementById('galFile').files[0]);
-    const res = await fetch('/api/admin/upload-gallery', { method: 'POST', body: formData });
-    const data = await res.json();
-    alert(data.message);
-    closeEditModal('galleryModal');
-    document.getElementById('galleryForm').reset();
-    loadAdminData();
-};
-
-async function deleteGalleryItem(id) {
-    if(!confirm('Delete this photo from the gallery?')) return;
-    const res = await fetch('/api/admin/gallery/' + id, { method: 'DELETE' });
-    const data = await res.json();
-    alert(data.message);
-    loadAdminData();
+function switchTab(tabType, element) {
+    currentFilter = tabType;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    
+    if (element) {
+        element.classList.add('active');
+    } else if (window.event && window.event.target) {
+        window.event.target.classList.add('active');
+    }
+    
+    renderAppointments();
 }
 
-document.addEventListener('DOMContentLoaded', loadAdminData);
-document.getElementById('change-credentials-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const newUsername = document.getElementById('new-admin-user').value;
-    const newPassword = document.getElementById('new-admin-pass').value;
+function filterAppointments() {
+    renderAppointments();
+}
 
-    const res = await fetch('/api/admin/change-credentials', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newUsername, newPassword })
+// ==========================================
+// ==========================================
+// Render Gallery Cards with ID-based Deletion
+// ==========================================
+async function loadDynamicAdminContent() {
+    try {
+        const res = await fetch(`/api/content?t=${Date.now()}`); // Force fresh fetch
+        const result = await res.json();
+
+        if (result.success && result.data) {
+            const content = result.data;
+
+            // Load Profile Text & Picture
+            if (content.profile) {
+                const nameInput = document.getElementById('prof-name-input');
+                const titleInput = document.getElementById('prof-title-input');
+                const bioInput = document.getElementById('prof-bio-input');
+                const currentPic = document.getElementById('current-profile-pic');
+
+                if (nameInput) nameInput.value = content.profile.name || '';
+                if (titleInput) titleInput.value = content.profile.title || '';
+                if (bioInput) bioInput.value = content.profile.bio || '';
+                if (currentPic && content.profile.profilePic) currentPic.src = content.profile.profilePic;
+            }
+
+            // Load Certifications
+            const certsList = document.getElementById('admin-certs-list');
+            if (certsList && content.certifications) {
+                certsList.innerHTML = content.certifications.map(c => `
+                    <li><i class="fa-solid fa-award"></i> <strong>${c.title}:</strong> ${c.description}</li>
+                `).join('');
+            }
+
+            // Load Gallery Items
+            const galleryGrid = document.getElementById('admin-gallery-grid');
+            if (galleryGrid) {
+                if (content.gallery && content.gallery.length > 0) {
+                    galleryGrid.innerHTML = content.gallery.map((item, index) => {
+                        // Pass unique ID if available, otherwise fall back to encoded imageUrl or index
+                        const targetKey = item._id || encodeURIComponent(item.imageUrl) || index;
+                        
+                        return `
+                            <div class="gallery-card" style="background:#fff; border:1px solid #e2ebe5; border-radius:10px; overflow:hidden; margin-bottom:1rem; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+                                <img src="${item.imageUrl}" style="width:100%; height:180px; object-fit:cover; display:block;">
+                                <div style="padding: 0.8rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-size:0.9rem; font-weight:600; color:#2b4336;">${item.title || 'Untitled'}</span>
+                                    <button type="button" onclick="deleteGalleryImage('${targetKey}')" style="background:#d9534f; color:#ffffff; border:none; padding:6px 12px; border-radius:6px; font-weight:600; cursor:pointer; font-size:0.8rem;">
+                                        <i class="fa-solid fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    galleryGrid.innerHTML = '<p style="color:#666; text-align:center; grid-column: 1 / -1;">No photos in gallery yet.</p>';
+                }
+            }
+        }
+    } catch (err) {
+        console.error('Failed to load dynamic admin content:', err);
+    }
+}
+
+// Function to handle image deletion request
+async function deleteGalleryImage(targetKey) {
+    if (!confirm('Are you sure you want to delete this photo from the gallery?')) return;
+
+    try {
+        const res = await fetch(`/api/admin/gallery/${targetKey}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await res.json();
+        
+        if (data.success) {
+            alert('Photo deleted permanently!');
+            await loadDynamicAdminContent(); // Refresh grid dynamically
+        } else {
+            alert('Delete failed: ' + (data.message || 'Unknown error'));
+        }
+    } catch (err) {
+        console.error('Delete request error:', err);
+        alert('Server error while deleting photo.');
+    }
+}
+
+// Global Refresh Helper
+function loadAdminData() {
+    loadAppointments();
+    loadDynamicAdminContent();
+}
+
+// ==========================================
+// 4. Initialize & Form Bindings
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    initSidebarNav();
+    loadAppointments();
+    loadDynamicAdminContent();
+
+    // Credentials Form
+    document.getElementById('change-credentials-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newUsername = document.getElementById('new-admin-user').value.trim();
+        const newPassword = document.getElementById('new-admin-pass').value.trim();
+
+        if (!newUsername || !newPassword) {
+            alert('Please provide both username and password.');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/admin/change-credentials', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ newUsername, newPassword })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                alert(data.message || 'Credentials updated successfully!');
+                e.target.reset();
+            } else {
+                alert('Error: ' + (data.message || 'Failed to update credentials.'));
+            }
+        } catch (err) {
+            console.error('Credential update error:', err);
+            alert('Server error.');
+        }
     });
 
-    const data = await res.json();
-    alert(data.message);
+    // Profile Details Form
+    document.getElementById('admin-profile-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            name: document.getElementById('prof-name-input').value,
+            title: document.getElementById('prof-title-input').value,
+            bio: document.getElementById('prof-bio-input').value
+        };
+
+        const res = await fetch('/api/admin/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        alert(data.message || 'Profile details saved!');
+    });
+
+    // Profile Picture Upload
+    document.getElementById('profile-pic-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('profile-pic-input');
+        if (!fileInput.files[0]) {
+            alert('Please select an image file.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('profilePic', fileInput.files[0]);
+
+        try {
+            const res = await fetch('/api/admin/upload-profile-pic', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                alert('Profile picture updated!');
+                document.getElementById('current-profile-pic').src = data.url;
+                e.target.reset();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (err) {
+            console.error('Upload error:', err);
+            alert('Upload failed.');
+        }
+    });
+
+    // Certification Form
+    document.getElementById('admin-cert-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            title: document.getElementById('cert-title-input').value,
+            description: document.getElementById('cert-desc-input').value
+        };
+
+        const res = await fetch('/api/admin/certifications', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        alert(data.message || 'Certification added!');
+        e.target.reset();
+        loadDynamicAdminContent();
+    });
+
+    // Gallery Upload Form
+    document.getElementById('admin-gallery-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('title', document.getElementById('gallery-title-input').value);
+        formData.append('galleryImage', document.getElementById('gallery-file-input').files[0]);
+
+        const res = await fetch('/api/admin/upload-gallery', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+        alert(data.message || 'Photo uploaded!');
+        e.target.reset();
+        loadDynamicAdminContent();
+    });
 });

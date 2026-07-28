@@ -49,6 +49,8 @@ const requireAdminAuth = (req, res, next) => {
     res.setHeader('WWW-Authenticate', 'Basic realm="Admin Panel Access"');
     return res.status(401).send('Invalid username or password.');
 };
+// Serve uploaded images statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // HTML Page Fallback Routes
 app.get('/about', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'about.html'));

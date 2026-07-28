@@ -20,7 +20,7 @@
         <a href="/services" class="active">Services & Plans</a>
         <a href="/gallery">Gallery</a>
         <a href="/testimonials">Testimonials</a>
-        <button class="btn btn-book-nav" onclick="openModal()">Book Appointment</button>
+
         <a href="/admin" class="admin-btn">Admin Panel</a>
       </nav>
     </div>
@@ -29,7 +29,7 @@
   <main class="container section-container">
     <div class="section-header">
       <h2>Training Plans</h2>
-      <p>Choose a session structure that matches your personal wellness goals.</p>
+      <p>Choose a plan and proceed directly to payment.</p>
     </div>
 
     <!-- Pricing Cards Grid -->
@@ -41,7 +41,8 @@
           <li>✔ 1-on-1 Consultation</li>
           <li>✔ Basic Pose Assessment</li>
         </ul>
-        <button class="btn btn-primary" onclick="openModal()">Book Now</button>
+        <!-- Triggers Payment Popup directly -->
+        <button class="btn btn-primary" onclick="initiatePayment('Basic Guidance', 199)">Proceed to Pay ₹199</button>
       </div>
 
       <div class="pricing-card highlighted">
@@ -52,85 +53,40 @@
           <li>✔ Personalized Health Plan</li>
           <li>✔ Weekly Meditation & Diet Guidance</li>
         </ul>
-        <button class="btn btn-primary" onclick="openModal()">Book Now</button>
+        <!-- Triggers Payment Popup directly -->
+        <button class="btn btn-primary" onclick="initiatePayment('Complete Support', 499)">Proceed to Pay ₹499</button>
       </div>
     </div>
   </main>
 
-  <!-- Global Appointment Popup Modal -->
-  <div id="appointmentModal" class="modal-overlay">
-    <div class="modal-box">
-      <button class="close-modal" onclick="closeModal()">&times;</button>
+  <!-- Payment Modal Interface -->
+  <div id="paymentModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 500px; grid-template-columns: 1fr;">
+      <button class="close-modal" onclick="closePaymentModal()">&times;</button>
       
-      <!-- Left Sidebar inside Modal -->
-      <div class="modal-sidebar">
-        <div class="sidebar-badge"><i class="fa-solid fa-shield"></i> Secure Booking</div>
-        <div class="sidebar-badge"><i class="fa-solid fa-clock"></i> Flexible Timings</div>
-      </div>
-
-      <!-- Right Form Area -->
-      <div class="modal-form-area">
-        <h2 class="modal-title">APPOINTMENT</h2>
+      <div class="modal-form-area" style="text-align: center;">
+        <h2 class="modal-title">PAYMENT CHECKOUT</h2>
         <div class="modal-divider"></div>
 
-        <form id="appointmentForm">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Name <span>*</span></label>
-              <input type="text" id="name" required placeholder="Full Name" />
-            </div>
-            <div class="form-group">
-              <label>WhatsApp <span>*</span></label>
-              <div class="phone-input">
-                <span class="country-code">IN +91</span>
-                <input type="tel" id="whatsappNumber" required placeholder="Phone Number" />
-              </div>
-            </div>
+        <p style="font-weight: 600; color: #2b4336; margin-bottom: 0.5rem;" id="pay-plan-title">Selected Plan: -</p>
+        <h3 style="font-size: 2rem; color: #436d58; margin-bottom: 1.5rem;" id="pay-plan-amount">₹0</h3>
+
+        <form id="paymentForm">
+          <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+            <label>Full Name <span>*</span></label>
+            <input type="text" id="pay-name" required placeholder="Enter Your Name" />
+          </div>
+          <div class="form-group" style="margin-bottom: 1rem; text-align: left;">
+            <label>WhatsApp Number <span>*</span></label>
+            <input type="tel" id="pay-phone" required placeholder="Enter Phone Number" />
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>Email <span>*</span></label>
-              <input type="email" id="email" required placeholder="Email Address" />
-            </div>
-            <div class="form-group">
-              <label>Date <span>*</span></label>
-              <input type="date" id="appointmentDate" required />
-            </div>
+          <div style="background: #f7f9fa; padding: 1rem; border-radius: 8px; border: 1px dashed #436d58; margin-bottom: 1.5rem;">
+            <p style="font-size: 0.85rem; color: #555; margin: 0;">Scan UPI QR or pay directly to UPI ID:</p>
+            <strong style="color: #2b4336; font-size: 1.1rem;">puneeshkumar@upi</strong>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>Time <span>*</span></label>
-              <input type="time" id="appointmentTime" required value="06:00" />
-            </div>
-            <div class="form-group">
-              <label>Age Group <span>*</span></label>
-              <select id="ageGroup">
-                <option value="18 - 25">18 - 25</option>
-                <option value="26 - 35">26 - 35</option>
-                <option value="36 - 50">36 - 50</option>
-                <option value="50+">50+</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Occupation <span>*</span></label>
-              <input type="text" id="concern" placeholder="e.g. Student / Working Professional" required />
-            </div>
-            <div class="form-group">
-              <label>Gender <span>*</span></label>
-              <select id="gender">
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-          </div>
-
-          <button type="submit" id="submitBtn" class="modal-submit-btn">Submit Appointment</button>
+          <button type="submit" class="modal-submit-btn">Confirm Payment via WhatsApp</button>
         </form>
       </div>
     </div>

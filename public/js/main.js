@@ -3,7 +3,6 @@
 // ==========================================
 function setupMobileMenu() {
     const menuBtn = document.getElementById('mobile-menu-btn');
-    // Flexible selector to handle both MPA (<nav class="nav-menu">) and SPA (header nav ul)
     const navMenu = document.getElementById('nav-menu') || document.querySelector('header nav ul') || document.querySelector('header nav');
 
     if (menuBtn && navMenu) {
@@ -128,8 +127,30 @@ window.onclick = function (event) {
 };
 
 // ==========================================
-// 4. Form Submissions (Appointments & Reviews)
+// 4. Payment Interface Controls
 // ==========================================
+function initiatePayment(planName, price) {
+    const payTitle = document.getElementById('pay-plan-title');
+    const payAmount = document.getElementById('pay-plan-amount');
+    const modal = document.getElementById('paymentModal');
+
+    if (payTitle && payAmount && modal) {
+        payTitle.innerText = `Selected Plan: ${planName}`;
+        payAmount.innerText = `₹${price}`;
+        modal.style.display = 'flex';
+    }
+}
+
+function closePaymentModal() {
+    const modal = document.getElementById('paymentModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// ==========================================
+// 5. Form Submissions
+// ==========================================
+
+// Appointment Form Handler
 async function handleFormSubmit(e) {
     e.preventDefault();
 
@@ -183,7 +204,7 @@ async function handleFormSubmit(e) {
     }
 }
 
-// Testimonials
+// Load Approved Testimonials
 async function loadTestimonials() {
     const list = document.getElementById('testimonials-list');
     if (!list) return;
@@ -207,7 +228,7 @@ async function loadTestimonials() {
 }
 
 // ==========================================
-// 5. Initialize on Page Load
+// 6. Initialize on Page Load & Bind Event Listeners
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     setupMobileMenu();
@@ -215,33 +236,60 @@ document.addEventListener('DOMContentLoaded', () => {
     setupDateLimits();
     loadTestimonials();
 
-    // Bind Appointment Form Submit Listener
+    // Bind Appointment Form Listener
     const appForm = document.getElementById('appointmentForm') || document.getElementById('appointment-form');
     if (appForm) {
         appForm.addEventListener('submit', handleFormSubmit);
     }
 
-    // Bind Testimonial Form Submit Listener
+    // Bind Payment Form Listener
+    const paymentForm = document.getElementById('paymentForm');
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('pay-name').value;
+            const phone = document.getElementById('pay-phone').value;
+            const planText = document.getElementById('pay-plan-title').innerText;
+            const priceText = document.getElementById('pay-plan-amount').innerText;
+
+            const message = `Hello Puneesh Kumar, I want to confirm payment for session plan.\n\n*Plan:* ${planText}\n*Amount:* ${priceText}\n*Name:* ${name}\n*Phone:* ${phone}`;
+            const trainerPhone = "918795296754";
+            const waUrl = `https://wa.me/${trainerPhone}?text=${encodeURIComponent(message)}`;
+
+            closePaymentModal();
+            window.open(waUrl, '_blank');
+        });
+    }
+
+    // Bind Testimonial Form Listener (with Photo Support)
     const testiForm = document.getElementById('testimonial-form');
     if (testiForm) {
         testiForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const payload = {
-                name: document.getElementById('testi-name').value,
-                roleOrCity: document.getElementById('testi-role').value,
-                rating: document.getElementById('testi-rating').value,
-                message: document.getElementById('testi-message').value
-            };
+            
+            const formData = new FormData();
+            formData.append('name', document.getElementById('testi-name').value);
+            formData.append('rating', document.getElementById('testi-rating').value);
+            formData.append('message', document.getElementById('testi-message').value);
+            
+            const imageInput = document.getElementById('testi-image');
+            if (imageInput && imageInput.files[0]) {
+                formData.append('clientImage', imageInput.files[0]);
+            }
 
-            const res = await fetch('/api/content/testimonials', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            try {
+                const res = await fetch('/api/content/testimonials', {
+                    method: 'POST',
+                    body: formData
+                });
 
-            const data = await res.json();
-            alert(data.message || 'Review submitted!');
-            e.target.reset();
+                const data = await res.json();
+                alert(data.message || 'Thank you! Your review has been submitted for approval.');
+                e.target.reset();
+            } catch (err) {
+                console.error('Testimonial submission error:', err);
+                alert('Failed to submit review.');
+            }
         });
     }
 });

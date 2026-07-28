@@ -20,6 +20,7 @@
         <a href="/services">Services & Plans</a>
         <a href="/gallery">Gallery</a>
         <a href="/testimonials">Testimonials</a>
+        
         <a href="/admin" class="admin-btn">Admin Panel</a>
       </nav>
     </div>
@@ -32,7 +33,8 @@
       <p class="subtitle">Yoga Trainer | Wellness Expert</p>
       <p class="tagline">Teaching yoga to every age group and transforming lifestyles through authentic practice.</p>
       <div class="hero-buttons">
-        <a href="/services" class="btn btn-primary">Book Consultation</a>
+        <!-- Direct Popup Trigger -->
+        <button class="btn btn-primary" onclick="openModal()">Book Consultation</button>
         <a href="/about" class="btn btn-secondary">Learn More</a>
       </div>
     </div>
@@ -59,6 +61,78 @@
       </div>
     </div>
   </section>
+
+  <!-- Global Appointment Popup Modal -->
+  <div id="appointmentModal" class="modal-overlay">
+    <div class="modal-box">
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+      
+      <!-- Left Sidebar inside Modal -->
+      <div class="modal-sidebar">
+        <div class="sidebar-badge">✔ Secure Booking</div>
+        <div class="sidebar-badge">🕒 Flexible Timings</div>
+      </div>
+
+      <!-- Right Form Area -->
+      <div class="modal-form-area">
+        <h2 class="modal-title">APPOINTMENT</h2>
+        <div class="modal-divider"></div>
+
+        <form id="appointmentForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Name <span>*</span></label>
+              <input type="text" id="name" required placeholder="Full Name" />
+            </div>
+            <div class="form-group">
+              <label>WhatsApp <span>*</span></label>
+              <input type="tel" id="whatsappNumber" required placeholder="Phone Number" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email <span>*</span></label>
+              <input type="email" id="email" required placeholder="Email Address" />
+            </div>
+            <div class="form-group">
+              <label>Date <span>*</span></label>
+              <input type="date" id="appointmentDate" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Time <span>*</span></label>
+              <input type="time" id="appointmentTime" required value="06:00" />
+            </div>
+            <div class="form-group">
+              <label>Age Group <span>*</span></label>
+              <select id="ageGroup">
+                <option value="18 - 25">18 - 25</option>
+                <option value="26 - 35">26 - 35</option>
+                <option value="36 - 50">36 - 50</option>
+                <option value="50+">50+</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Gender <span>*</span></label>
+              <select id="gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" id="submitBtn" class="modal-submit-btn">Submit Appointment</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <footer class="footer">
     <p>&copy; 2026 Puneesh Kumar Yoga & Wellness. All rights reserved.</p>

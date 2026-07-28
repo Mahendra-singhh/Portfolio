@@ -1,4 +1,36 @@
-// --- Load Dynamic Content from DB on Startup ---
+// ==========================================
+// 1. Mobile Hamburger Menu Toggle
+// ==========================================
+function setupMobileMenu() {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    // Flexible selector to handle both MPA (<nav class="nav-menu">) and SPA (header nav ul)
+    const navMenu = document.getElementById('nav-menu') || document.querySelector('header nav ul') || document.querySelector('header nav');
+
+    if (menuBtn && navMenu) {
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navMenu.classList.toggle('active');
+        });
+
+        // Close menu when clicking any nav link
+        navMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+            });
+        });
+
+        // Close menu when clicking outside of navbar
+        document.addEventListener('click', (e) => {
+            if (!navMenu.contains(e.target) && e.target !== menuBtn) {
+                navMenu.classList.remove('active');
+            }
+        });
+    }
+}
+
+// ==========================================
+// 2. Load Dynamic Content from DB
+// ==========================================
 async function loadDynamicContent() {
     try {
         const response = await fetch('/api/content');
@@ -8,28 +40,36 @@ async function loadDynamicContent() {
             const content = result.data;
             const prof = content.profile;
 
-            if (prof.name) {
-                document.querySelectorAll('.prof-name-text').forEach(el => el.innerText = prof.name);
-            }
-            if (prof.title) {
-                document.querySelectorAll('.prof-title-text').forEach(el => el.innerText = prof.title);
-            }
-            if (prof.tagline) {
-                const taglineEl = document.getElementById('profTagline');
-                if (taglineEl) taglineEl.innerText = prof.tagline;
-            }
-            if (prof.bio) {
-                const bioEl = document.getElementById('profBioText');
-                if (bioEl) bioEl.innerText = prof.bio;
+            if (prof) {
+                if (prof.name) {
+                    document.querySelectorAll('.prof-name-text').forEach(el => el.innerText = prof.name);
+                }
+                if (prof.title) {
+                    document.querySelectorAll('.prof-title-text').forEach(el => el.innerText = prof.title);
+                }
+                if (prof.tagline) {
+                    const taglineEl = document.getElementById('profTagline');
+                    if (taglineEl) taglineEl.innerText = prof.tagline;
+                }
+                if (prof.bio) {
+                    const bioEl = document.getElementById('profBioText') || document.getElementById('about-bio-text');
+                    if (bioEl) bioEl.innerText = prof.bio;
+                }
+                if (prof.profilePic) {
+                    const profileImgEl = document.getElementById('profileImageDisplay') || document.getElementById('about-profile-img');
+                    if (profileImgEl) {
+                        if (profileImgEl.tagName === 'IMG') {
+                            profileImgEl.src = prof.profilePic;
+                        } else {
+                            profileImgEl.style.backgroundImage = `url('${prof.profilePic}')`;
+                        }
+                    }
+                }
             }
 
-            if (prof.profilePic) {
-                const profileImgEl = document.getElementById('profileImageDisplay');
-                if (profileImgEl) profileImgEl.style.backgroundImage = `url('${prof.profilePic}')`;
-            }
-
-            const certsList = document.getElementById('dynamicCertsList');
-            if (certsList && content.certifications) {
+            // Render Certifications
+            const certsList = document.getElementById('dynamicCertsList') || document.getElementById('certifications-list');
+            if (certsList && content.certifications && content.certifications.length > 0) {
                 certsList.innerHTML = '';
                 content.certifications.forEach(c => {
                     certsList.innerHTML += `
@@ -38,13 +78,14 @@ async function loadDynamicContent() {
                 });
             }
 
-            const galleryGrid = document.getElementById('dynamicGalleryGrid');
+            // Render Gallery Items
+            const galleryGrid = document.getElementById('dynamicGalleryGrid') || document.getElementById('gallery-container');
             if (galleryGrid && content.gallery && content.gallery.length > 0) {
                 galleryGrid.innerHTML = '';
                 content.gallery.forEach(item => {
                     galleryGrid.innerHTML += `
                         <div class="gallery-item">
-                            <img src="${item.imageUrl}" style="width:100%; height:220px; object-fit:cover;">
+                            <img src="${item.imageUrl}" alt="${item.title}" style="width:100%; height:220px; object-fit:cover;">
                             <div class="gallery-caption">${item.title}</div>
                         </div>
                     `;
@@ -56,55 +97,27 @@ async function loadDynamicContent() {
     }
 }
 
-// --- Set Minimum Selectable Date to Today ---
+// ==========================================
+// 3. Date Limits & Modal Controls
+// ==========================================
 function setupDateLimits() {
-    const dateInput = document.getElementById('appointmentDate');
+    const dateInput = document.getElementById('appointmentDate') || document.getElementById('app-date');
     if (dateInput) {
         const today = new Date().toISOString().split('T')[0];
-        dateInput.min = today; // Prevents picking past dates in browser calendar
-        dateInput.value = today; // Sets default value to today
+        dateInput.min = today;
+        dateInput.value = today;
     }
 }
 
-// Execute on Page Load
-document.addEventListener('DOMContentLoaded', () => {
-    loadDynamicContent();
-    setupDateLimits();
-});
-
-// --- Page Navigation ---
-function navigateTo(pageId) {
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => page.classList.remove('active'));
-
-    const selectedPage = document.getElementById(pageId);
-    if (selectedPage) {
-        selectedPage.classList.add('active');
-    }
-
-    const navLinks = document.querySelectorAll('nav a');
-    navLinks.forEach(link => {
-        if (!link.classList.contains('btn-nav-book')) {
-            link.classList.remove('active');
-        }
-    });
-
-    const activeNav = document.getElementById('nav-' + pageId);
-    if (activeNav) {
-        activeNav.classList.add('active');
-    }
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// --- Modal Control ---
 function openModal() {
     setupDateLimits();
-    document.getElementById('appointmentModal').style.display = 'flex';
+    const modal = document.getElementById('appointmentModal');
+    if (modal) modal.style.display = 'flex';
 }
 
 function closeModal() {
-    document.getElementById('appointmentModal').style.display = 'none';
+    const modal = document.getElementById('appointmentModal');
+    if (modal) modal.style.display = 'none';
 }
 
 window.onclick = function (event) {
@@ -114,23 +127,26 @@ window.onclick = function (event) {
     }
 };
 
-// --- Form Submission to Backend API ---
-// --- Form Submission to Backend API + WhatsApp Redirect ---
+// ==========================================
+// 4. Form Submissions (Appointments & Reviews)
+// ==========================================
 async function handleFormSubmit(e) {
     e.preventDefault();
 
     const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
-    submitBtn.innerText = 'Submitting...';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Submitting...';
+    }
 
-    const name = document.getElementById('name').value;
-    const whatsappNumber = document.getElementById('whatsappNumber').value;
-    const email = document.getElementById('email').value;
-    const appointmentDate = document.getElementById('appointmentDate').value;
-    const appointmentTime = document.getElementById('appointmentTime').value;
-    const concern = document.getElementById('concern').value;
-    const ageGroup = document.getElementById('ageGroup').value;
-    const gender = document.getElementById('gender').value;
+    const name = document.getElementById('name')?.value || document.getElementById('app-name')?.value;
+    const whatsappNumber = document.getElementById('whatsappNumber')?.value || document.getElementById('app-phone')?.value;
+    const email = document.getElementById('email')?.value || '';
+    const appointmentDate = document.getElementById('appointmentDate')?.value || document.getElementById('app-date')?.value;
+    const appointmentTime = document.getElementById('appointmentTime')?.value || '10:00 AM';
+    const concern = document.getElementById('concern')?.value || document.getElementById('app-plan')?.value || 'General Yoga Session';
+    const ageGroup = document.getElementById('ageGroup')?.value || 'Not Specified';
+    const gender = document.getElementById('gender')?.value || 'Not Specified';
 
     const formData = { name, whatsappNumber, email, appointmentDate, appointmentTime, concern, ageGroup, gender };
 
@@ -146,81 +162,86 @@ async function handleFormSubmit(e) {
         if (result.success) {
             alert('Appointment submitted successfully!');
             
-            // Construct direct WhatsApp URL for Puneesh's WhatsApp
-            const message = `Hello Puneesh Kumar, I have booked an appointment.\n\n*Name:* ${name}\n*Date:* ${appointmentDate} at ${appointmentTime}\n*Concern:* ${concern}\n*Age Group:* ${ageGroup}\n*Gender:* ${gender}`;
-            const trainerPhone = "918795296754"; // Replace with Puneesh's actual phone number
+            const message = `Hello Puneesh Kumar, I have booked an appointment.\n\n*Name:* ${name}\n*Date:* ${appointmentDate} at ${appointmentTime}\n*Concern/Plan:* ${concern}`;
+            const trainerPhone = "918795296754";
             const waUrl = `https://wa.me/${trainerPhone}?text=${encodeURIComponent(message)}`;
 
-            document.getElementById('appointmentForm').reset();
+            e.target.reset();
             closeModal();
-
-            // Open WhatsApp in a new tab to notify Puneesh immediately
             window.open(waUrl, '_blank');
         } else {
             alert('Error: ' + result.message);
         }
     } catch (error) {
         console.error('Submission Error:', error);
-        alert('Server error. Ensure backend and MongoDB are running.');
+        alert('Server error. Ensure backend is running.');
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'Submit Appointment';
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Submit Appointment';
+        }
     }
 }
-// Mobile Hamburger Menu Toggle
-document.addEventListener('DOMContentLoaded', () => {
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    const navUl = document.querySelector('header nav ul');
 
-    if (menuBtn && navUl) {
-        menuBtn.addEventListener('click', () => {
-            navUl.classList.toggle('active');
-        });
-
-        // Close menu when a link inside is clicked
-        navUl.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navUl.classList.remove('active');
-            });
-        });
-    }
-});
-// Submit Testimonial
-document.getElementById('testimonial-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const payload = {
-        name: document.getElementById('testi-name').value,
-        roleOrCity: document.getElementById('testi-role').value,
-        rating: document.getElementById('testi-rating').value,
-        message: document.getElementById('testi-message').value
-    };
-
-    const res = await fetch('/api/content/testimonials', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-
-    const data = await res.json();
-    alert(data.message);
-    e.target.reset();
-});
-
-// Load Approved Testimonials
+// Testimonials
 async function loadTestimonials() {
     const list = document.getElementById('testimonials-list');
     if (!list) return;
 
-    const res = await fetch('/api/content/testimonials');
-    const testimonials = await res.json();
+    try {
+        const res = await fetch('/api/content/testimonials');
+        const testimonials = await res.json();
 
-    list.innerHTML = testimonials.map(t => `
-        <div class="testimonial-card">
-            <h4>${t.name} <small>(${t.roleOrCity})</small></h4>
-            <p>Rating: ${'⭐'.repeat(t.rating)}</p>
-            <p>"${t.message}"</p>
-        </div>
-    `).join('');
+        if (Array.isArray(testimonials) && testimonials.length > 0) {
+            list.innerHTML = testimonials.map(t => `
+                <div class="testimonial-card">
+                    <h4>${t.name} <small>(${t.roleOrCity || 'Client'})</small></h4>
+                    <p>Rating: ${'⭐'.repeat(t.rating || 5)}</p>
+                    <p>"${t.message}"</p>
+                </div>
+            `).join('');
+        }
+    } catch (err) {
+        console.error('Failed to load testimonials:', err);
+    }
 }
 
-document.addEventListener('DOMContentLoaded', loadTestimonials);
+// ==========================================
+// 5. Initialize on Page Load
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    setupMobileMenu();
+    loadDynamicContent();
+    setupDateLimits();
+    loadTestimonials();
+
+    // Bind Appointment Form Submit Listener
+    const appForm = document.getElementById('appointmentForm') || document.getElementById('appointment-form');
+    if (appForm) {
+        appForm.addEventListener('submit', handleFormSubmit);
+    }
+
+    // Bind Testimonial Form Submit Listener
+    const testiForm = document.getElementById('testimonial-form');
+    if (testiForm) {
+        testiForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('testi-name').value,
+                roleOrCity: document.getElementById('testi-role').value,
+                rating: document.getElementById('testi-rating').value,
+                message: document.getElementById('testi-message').value
+            };
+
+            const res = await fetch('/api/content/testimonials', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            alert(data.message || 'Review submitted!');
+            e.target.reset();
+        });
+    }
+});

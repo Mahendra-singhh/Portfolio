@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Testimonials & Reviews | Puneesh Kumar Yoga</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/" class="logo">Puneesh Kumar</a>
+      <button class="menu-toggle" id="mobile-menu-btn" aria-label="Toggle Navigation">☰</button>
+
+      <nav class="nav-menu" id="nav-menu">
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/services">Services & Plans</a>
+        <a href="/gallery">Gallery</a>
+        <a href="/testimonials" class="active">Testimonials</a>
+        <a href="/admin" class="admin-btn">Admin Panel</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section-container">
+    <div class="section-header">
+      <h2>What Our Clients Say</h2>
+      <p>Real feedback from active students and individual clients.</p>
+    </div>
+
+    <!-- Approved Reviews List -->
+    <div id="testimonials-list" class="testimonials-grid">
+      <!-- Testimonials rendered dynamically -->
+    </div>
+
+    <!-- Dedicated Review Submission Card -->
+    <div class="review-form-card">
+      <h3>Leave a Review</h3>
+      <p>Have you attended a session? Share your feedback with us!</p>
+      
+      <form id="testimonial-form" class="review-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="testi-name">Full Name</label>
+            <input type="text" id="testi-name" placeholder="e.g. Rahul Sharma" required />
+          </div>
+          <div class="form-group">
+            <label for="testi-role">City / Occupation</label>
+            <input type="text" id="testi-role" placeholder="e.g. Lucknow, Student" />
+          </div>
+          <div class="form-group">
+            <label for="testi-rating">Rating</label>
+            <select id="testi-rating">
+              <option value="5">⭐⭐⭐⭐⭐ (5 / 5)</option>
+              <option value="4">⭐⭐⭐⭐ (4 / 5)</option>
+              <option value="3">⭐⭐⭐ (3 / 5)</option>
+              <option value="2">⭐⭐ (2 / 5)</option>
+              <option value="1">⭐ (1 / 5)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="testi-message">Your Review</label>
+          <textarea id="testi-message" rows="4" placeholder="Share your experience..." required></textarea>
+        </div>
+
+        <button type="submit" class="submit-review-btn">Submit Review</button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 Puneesh Kumar Yoga & Wellness. All rights reserved.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

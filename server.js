@@ -49,7 +49,26 @@ const requireAdminAuth = (req, res, next) => {
     res.setHeader('WWW-Authenticate', 'Basic realm="Admin Panel Access"');
     return res.status(401).send('Invalid username or password.');
 };
+// HTML Page Fallback Routes
+app.get('/about', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'about.html'));
+});
 
+app.get('/services', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'services.html'));
+});
+
+app.get('/gallery', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'gallery.html'));
+});
+
+app.get('/testimonials', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'testimonials.html'));
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 // Protect admin API endpoints and admin HTML page
 app.get('/admin', requireAdminAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));

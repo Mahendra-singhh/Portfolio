@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Services & Pricing Plans | Puneesh Kumar</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="/" class="logo">Puneesh Kumar</a>
+      <button class="menu-toggle" id="mobile-menu-btn" aria-label="Toggle Navigation">☰</button>
+
+      <nav class="nav-menu" id="nav-menu">
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/services" class="active">Services & Plans</a>
+        <a href="/gallery">Gallery</a>
+        <a href="/testimonials">Testimonials</a>
+        <a href="/admin" class="admin-btn">Admin Panel</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section-container">
+    <div class="section-header">
+      <h2>Training Plans</h2>
+      <p>Choose a session structure that matches your personal wellness goals.</p>
+    </div>
+
+    <!-- Pricing Cards Grid -->
+    <div class="services-grid" id="pricing-plans-container">
+      <div class="pricing-card">
+        <h3>Basic Guidance</h3>
+        <p class="price">₹199</p>
+        <ul>
+          <li>✔ 1-on-1 Consultation</li>
+          <li>✔ Basic Pose Assessment</li>
+        </ul>
+        <a href="#booking-section" class="btn btn-primary">Book Now</a>
+      </div>
+
+      <div class="pricing-card highlighted">
+        <h3>Complete Support</h3>
+        <p class="price">₹499</p>
+        <ul>
+          <li>✔ Personalized Health Plan</li>
+          <li>✔ Weekly Meditation & Diet Guidance</li>
+        </ul>
+        <a href="#booking-section" class="btn btn-primary">Book Now</a>
+      </div>
+    </div>
+
+    <!-- Appointment Booking Form -->
+    <div id="booking-section" class="booking-card">
+      <h3>Book an Appointment</h3>
+      <form id="appointment-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="app-name">Your Full Name</label>
+            <input type="text" id="app-name" required placeholder="e.g. Amit Verma" />
+          </div>
+          <div class="form-group">
+            <label for="app-phone">Phone Number</label>
+            <input type="tel" id="app-phone" required placeholder="e.g. 9876543210" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="app-date">Preferred Date</label>
+            <input type="date" id="app-date" required />
+          </div>
+          <div class="form-group">
+            <label for="app-plan">Select Plan</label>
+            <select id="app-plan">
+              <option value="Basic Guidance - ₹199">Basic Guidance - ₹199</option>
+              <option value="Complete Support - ₹499">Complete Support - ₹499</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Confirm Booking</button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 Puneesh Kumar Yoga & Wellness. All rights reserved.</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

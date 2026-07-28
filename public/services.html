@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Services & Pricing Plans | Puneesh Kumar</title>
+  <title>Services & Plans | Puneesh Kumar Yoga</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -20,6 +20,7 @@
         <a href="/services" class="active">Services & Plans</a>
         <a href="/gallery">Gallery</a>
         <a href="/testimonials">Testimonials</a>
+        <button class="btn btn-book-nav" onclick="openModal()">Book Appointment</button>
         <a href="/admin" class="admin-btn">Admin Panel</a>
       </nav>
     </div>
@@ -40,53 +41,100 @@
           <li>✔ 1-on-1 Consultation</li>
           <li>✔ Basic Pose Assessment</li>
         </ul>
-        <a href="#booking-section" class="btn btn-primary">Book Now</a>
+        <button class="btn btn-primary" onclick="openModal()">Book Now</button>
       </div>
 
       <div class="pricing-card highlighted">
+        <span class="popular-badge">POPULAR</span>
         <h3>Complete Support</h3>
         <p class="price">₹499</p>
         <ul>
           <li>✔ Personalized Health Plan</li>
           <li>✔ Weekly Meditation & Diet Guidance</li>
         </ul>
-        <a href="#booking-section" class="btn btn-primary">Book Now</a>
+        <button class="btn btn-primary" onclick="openModal()">Book Now</button>
       </div>
     </div>
-
-    <!-- Appointment Booking Form -->
-    <div id="booking-section" class="booking-card">
-      <h3>Book an Appointment</h3>
-      <form id="appointment-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="app-name">Your Full Name</label>
-            <input type="text" id="app-name" required placeholder="e.g. Amit Verma" />
-          </div>
-          <div class="form-group">
-            <label for="app-phone">Phone Number</label>
-            <input type="tel" id="app-phone" required placeholder="e.g. 9876543210" />
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="app-date">Preferred Date</label>
-            <input type="date" id="app-date" required />
-          </div>
-          <div class="form-group">
-            <label for="app-plan">Select Plan</label>
-            <select id="app-plan">
-              <option value="Basic Guidance - ₹199">Basic Guidance - ₹199</option>
-              <option value="Complete Support - ₹499">Complete Support - ₹499</option>
-            </select>
-          </div>
-        </div>
-
-        <button type="submit" class="submit-btn">Confirm Booking</button>
-      </form>
-    </div>
   </main>
+
+  <!-- Global Appointment Popup Modal -->
+  <div id="appointmentModal" class="modal-overlay">
+    <div class="modal-box">
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+      
+      <!-- Left Sidebar inside Modal -->
+      <div class="modal-sidebar">
+        <div class="sidebar-badge"><i class="fa-solid fa-shield"></i> Secure Booking</div>
+        <div class="sidebar-badge"><i class="fa-solid fa-clock"></i> Flexible Timings</div>
+      </div>
+
+      <!-- Right Form Area -->
+      <div class="modal-form-area">
+        <h2 class="modal-title">APPOINTMENT</h2>
+        <div class="modal-divider"></div>
+
+        <form id="appointmentForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Name <span>*</span></label>
+              <input type="text" id="name" required placeholder="Full Name" />
+            </div>
+            <div class="form-group">
+              <label>WhatsApp <span>*</span></label>
+              <div class="phone-input">
+                <span class="country-code">IN +91</span>
+                <input type="tel" id="whatsappNumber" required placeholder="Phone Number" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email <span>*</span></label>
+              <input type="email" id="email" required placeholder="Email Address" />
+            </div>
+            <div class="form-group">
+              <label>Date <span>*</span></label>
+              <input type="date" id="appointmentDate" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Time <span>*</span></label>
+              <input type="time" id="appointmentTime" required value="06:00" />
+            </div>
+            <div class="form-group">
+              <label>Age Group <span>*</span></label>
+              <select id="ageGroup">
+                <option value="18 - 25">18 - 25</option>
+                <option value="26 - 35">26 - 35</option>
+                <option value="36 - 50">36 - 50</option>
+                <option value="50+">50+</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Occupation <span>*</span></label>
+              <input type="text" id="concern" placeholder="e.g. Student / Working Professional" required />
+            </div>
+            <div class="form-group">
+              <label>Gender <span>*</span></label>
+              <select id="gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" id="submitBtn" class="modal-submit-btn">Submit Appointment</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <footer class="footer">
     <p>&copy; 2026 Puneesh Kumar Yoga & Wellness. All rights reserved.</p>
